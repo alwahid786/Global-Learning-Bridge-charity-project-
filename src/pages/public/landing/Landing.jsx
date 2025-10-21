@@ -67,7 +67,7 @@ const LandingPage = () => {
               monitor performance—all in one place.
             </p>
             <Button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/become-member")}
               className="bg-[rgb(11,92,131)] text-white font-semibold hover:bg-[rgb(9,70,100)]"
             >
               Get Started

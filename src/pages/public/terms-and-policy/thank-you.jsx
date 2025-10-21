@@ -1,11 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import getEnv from "../../../configs/config";
 
 function ThankYouPage() {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate("/login");
+    window.open(getEnv("WARRANTY_SITE_URL"), "_blank");
   };
 
   return (

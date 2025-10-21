@@ -29,26 +29,12 @@ export default function LandingHeader() {
           className="h-10 w-10 rounded-full object-cover"
         />
         <h1 className="text-xl md:text-2xl font-bold tracking-wide">
-          National Warranty System
+          Global Learning Bridge
         </h1>
       </div>
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center gap-3">
-        <Button
-          onClick={() => handleNavigate("/login")}
-          className="
-            bg-transparent 
-            border border-white 
-            text-white 
-            hover:bg-white hover:text-[rgb(11,92,131)] 
-            transition-colors duration-300 
-            rounded-md px-5 py-2 font-semibold
-          "
-        >
-          Login
-        </Button>
-
         <Button
           onClick={() => handleNavigate("/become-member")}
           className="
@@ -90,13 +76,6 @@ export default function LandingHeader() {
       {/* Mobile Dropdown Menu */}
       {menuOpen && (
         <div className="absolute top-[72px] left-0 w-full bg-[rgb(11,92,131)] shadow-md flex flex-col items-center gap-4 py-5 md:hidden animate-fadeIn">
-          <Button
-            onClick={() => handleNavigate("/login")}
-            className="w-11/12 bg-transparent border border-white text-white hover:bg-white hover:text-[rgb(11,92,131)] rounded-md px-5 py-2 font-semibold transition-colors duration-300"
-          >
-            Login
-          </Button>
-
           <Button
             onClick={() => handleNavigate("/become-member")}
             className="w-11/12 bg-transparent border border-white text-white hover:bg-white hover:text-[rgb(11,92,131)] rounded-md px-5 py-2 font-semibold transition-colors duration-300"

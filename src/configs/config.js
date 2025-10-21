@@ -4,6 +4,7 @@ const config = Object.freeze({
   LOGO_URL_WITHOUT_BACKGROUND: import.meta.env.VITE_LOGO_URL_WITHOUT_BACKGROUND,
   STRIPE_PUBLISH_KEY: import.meta.env.VITE_STRIPE_PUBLISH_KEY,
   STRIPE_SECRET_KEY: import.meta.env.VITE_STRIPE_SECRET_KEY,
+  WARRANTY_SITE_URL: import.meta.env.VITE_WARRANTY_SITE_URL,
 });
 
 const getEnv = (key) => {
