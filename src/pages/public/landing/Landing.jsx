@@ -3,48 +3,48 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/shared/small/landing-Button.jsx";
 import { Card, CardContent } from "../../../components/shared/small/card.jsx";
-import getEnv from "../../../configs/config.js";
+import LandingHeader from "../../../components/public/landing-header/landing-header.jsx";
+import logo from "../../../assets/logo/logo.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUsers,
-  faFileInvoiceDollar,
-  faClipboardCheck,
+  faGraduationCap,
+  faHandsHelping,
+  faSchool,
 } from "@fortawesome/free-solid-svg-icons";
-import landingHeader from "../../../components/public/landing-header/landing-header.jsx";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   const cards = [
     {
-      title: "Membership",
-      desc: "Become a verified member to manage claims and access dashboard.",
-      icon: faUsers,
+      title: "Sponsor a Child",
+      desc: "Help provide quality education and school essentials to underprivileged children across the world.",
+      icon: faGraduationCap,
     },
     {
-      title: "Claims Management",
-      desc: "Clients can submit claims, and admins can approve or reject them easily.",
-      icon: faClipboardCheck,
+      title: "Volunteer & Teach",
+      desc: "Join our community of mentors and educators who dedicate their time to empower young minds through learning.",
+      icon: faHandsHelping,
     },
     {
-      title: "Invoice System",
-      desc: "Automatic invoice generation after claim approval with admin notifications.",
-      icon: faFileInvoiceDollar,
+      title: "Build Learning Centers",
+      desc: "Contribute to building digital classrooms and community learning centers in remote areas.",
+      icon: faSchool,
     },
   ];
 
   return (
     <div className="min-h-screen flex flex-col bg-white overflow-hidden">
       {/* Header */}
-      {landingHeader()}
+      <LandingHeader />
 
       {/* Hero Section */}
-      <section className="flex flex-1 items-center justify-center px-10 mt-24">
+      <section className="flex flex-1 items-center justify-center px-10 mt-34">
         <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl">
           {/* Left Logo Area */}
           <motion.img
-            src={getEnv("LOGO_URL_WITH_BACKGROUND")}
-            alt="Company Logo"
+            src={logo}
+            alt="Global Learning Bridge Logo"
             className="w-64 h-64 object-contain"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -59,32 +59,33 @@ const LandingPage = () => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-4xl font-bold text-[rgb(11,92,131)]">
-              Simplify Your Claims Management
+              Bridging Hearts Through Education
             </h2>
-            <p className="text-gray-600 text-lg">
-              National Warranty System helps clients file claims and receive
-              approvals faster. Admins can manage claims, send invoices, and
-              monitor performance—all in one place.
+            <p className="text-gray-700 text-lg leading-relaxed">
+              <strong>Global Learning Bridge</strong> is a non-profit initiative
+              committed to connecting learners, teachers, and donors to make
+              education accessible for all. Together, we can light the path to a
+              brighter future.
             </p>
             <Button
               onClick={() => navigate("/become-member")}
-              className="bg-[rgb(11,92,131)] text-white font-semibold hover:bg-[rgb(9,70,100)]"
+              className="bg-[#1A5D1A] text-white font-semibold hover:bg-[#134913]"
             >
-              Get Started
+              Get Involved
             </Button>
           </motion.div>
         </div>
       </section>
 
       {/* Cards Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-[#F9FAFB]">
         <div className="max-w-6xl mx-auto text-center mb-10">
           <h3 className="text-3xl font-bold text-[rgb(11,92,131)] mb-3">
-            What We Offer
+            How You Can Make a Difference
           </h3>
           <p className="text-gray-600">
-            Explore how National Warranty System simplifies the workflow for
-            clients and admins.
+            Every contribution brings hope and opportunity to children around
+            the world.
           </p>
         </div>
 
@@ -95,11 +96,11 @@ const LandingPage = () => {
               whileHover={{ scale: 1.05, y: -5 }}
               transition={{ type: "spring", stiffness: 200 }}
             >
-              <Card className="rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
-                <CardContent className="p-6 space-y-3">
+              <Card className="rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 bg-white">
+                <CardContent className="p-6 space-y-3 text-center">
                   <FontAwesomeIcon
-                    className="text-4xl text-[rgb(11,92,131)]"
                     icon={card.icon}
+                    className="text-5xl text-[rgb(11,92,131)] mb-2"
                   />
                   <h4 className="text-xl font-semibold text-[rgb(11,92,131)]">
                     {card.title}
@@ -114,7 +115,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="bg-[rgb(11,92,131)] text-white text-center py-4 text-sm">
-        © {new Date().getFullYear()} National Warranty System. All Rights
+        © {new Date().getFullYear()} Global Learning Bridge. All Rights
         Reserved.
       </footer>
     </div>

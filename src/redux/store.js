@@ -5,11 +5,11 @@ import authSlice from "./slices/authSlice";
 import userSlice from "./slices/userSlice";
 import claimsApis from "./apis/claimsApis";
 import chatApis from "./apis/chatApis";
-import clientApis from "./apis/clientsApis";
 import invoiceApis from "./apis/invoiceApis";
 import notificationsApis from "./apis/notificationsApis";
 import notificationsSlice from "./slices/notificationsSlice";
 import paymentApis from "./apis/paymentApis";
+import memberApis from "./apis/membersApis";
 
 const store = configureStore({
   reducer: {
@@ -19,7 +19,7 @@ const store = configureStore({
     [claimsApis.reducerPath]: claimsApis.reducer,
     [chatApis.reducerPath]: chatApis.reducer,
     [notificationsApis.reducerPath]: notificationsApis.reducer,
-    [clientApis.reducerPath]: clientApis.reducer,
+    [memberApis.reducerPath]: memberApis.reducer,
     [invoiceApis.reducerPath]: invoiceApis.reducer,
     [paymentApis.reducerPath]: paymentApis.reducer,
 
@@ -35,7 +35,7 @@ const store = configureStore({
       .concat(claimsApis.middleware)
       .concat(chatApis.middleware)
       .concat(notificationsApis.middleware)
-      .concat(clientApis.middleware)
+      .concat(memberApis.middleware)
       .concat(invoiceApis.middleware)
       .concat(paymentApis.middleware);
   },

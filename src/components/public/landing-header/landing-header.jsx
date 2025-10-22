@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Button from "../../shared/small/landing-Button";
-import getEnv from "../../../configs/config";
+import logo from "../../../assets/logo/Logo.jpg";
 
 export default function LandingHeader() {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function LandingHeader() {
         className="flex items-center gap-3 cursor-pointer"
       >
         <img
-          src={getEnv("LOGO_URL_WITHOUT_BACKGROUND")}
+          src={logo}
           alt="Company Logo"
           className="h-10 w-10 rounded-full object-cover"
         />
@@ -35,6 +35,19 @@ export default function LandingHeader() {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center gap-3">
+        <Button
+          onClick={() => handleNavigate("/blog")}
+          className="
+            bg-transparent 
+            border border-white 
+            text-white 
+            hover:bg-white hover:text-[rgb(11,92,131)] 
+            transition-colors duration-300 
+            rounded-md px-5 py-2 font-semibold
+          "
+        >
+          Blog
+        </Button>
         <Button
           onClick={() => handleNavigate("/become-member")}
           className="

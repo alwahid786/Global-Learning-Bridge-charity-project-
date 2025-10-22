@@ -20,6 +20,7 @@ const PrivacyPolicy = lazy(() =>
 const ThankYouPage = lazy(() =>
   import("./pages/public/terms-and-policy/thank-you")
 );
+const Blog = lazy(() => import("./pages/public/blog/Blog"));
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/thank-you" element={<ThankYouPage />} />
+            <Route path="/blog" element={<Blog />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

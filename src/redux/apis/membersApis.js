@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import getEnv from "../../configs/config.js";
 
-const clientApis = createApi({
-  reducerPath: "clientApis",
+const memberApis = createApi({
+  reducerPath: "memberApis",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${getEnv("SERVER_URL")}/api/clients`,
+    baseUrl: `${getEnv("SERVER_URL")}/api/members`,
     credentials: "include",
   }),
-  tagTypes: ["Clients"],
+  tagTypes: ["Members"],
 
   endpoints: (builder) => ({
     // Get all clients
@@ -25,17 +25,17 @@ const clientApis = createApi({
         url: `/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: "Clients", id }],
+      providesTags: (result, error, id) => [{ type: "Members", id }],
     }),
 
-    // Add new Client
-    addClient: builder.mutation({
+    // Add new Member
+    createMember: builder.mutation({
       query: (data) => ({
-        url: "/createClient",
+        url: "/createMember",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Clients"],
+      invalidatesTags: ["Members"],
     }),
 
     // Update Client
@@ -45,7 +45,7 @@ const clientApis = createApi({
         method: "PUT",
         body: data,
       }),
-      invalidatesTags: ["Clients"],
+      invalidatesTags: ["Members"],
     }),
 
     // Delete Client
@@ -54,7 +54,7 @@ const clientApis = createApi({
         url: `/deleteClient/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Clients"],
+      invalidatesTags: ["Members"],
     }),
 
     // Get Active Inactive Count
@@ -94,13 +94,13 @@ const clientApis = createApi({
 export const {
   useGetClientsQuery,
   useGetClientByIdQuery,
-  useAddClientMutation,
+  useCreateMemberMutation,
   useUpdateClientMutation,
   useDeleteClientMutation,
   useGetActiveInactiveCountQuery,
   useGetClientsStatQuery,
   useGetClientsStatByFiltersQuery,
   useGetClientsActivityStatsQuery,
-} = clientApis;
+} = memberApis;
 
-export default clientApis;
+export default memberApis;
