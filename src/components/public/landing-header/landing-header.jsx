@@ -36,6 +36,19 @@ export default function LandingHeader() {
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center gap-3">
         <Button
+          onClick={() => handleNavigate("/login")}
+          className="
+            bg-transparent 
+            border border-white 
+            text-white 
+            hover:bg-white hover:text-[rgb(11,92,131)] 
+            transition-colors duration-300 
+            rounded-md px-5 py-2 font-semibold
+          "
+        >
+          Login
+        </Button>
+        <Button
           onClick={() => handleNavigate("/blog")}
           className="
             bg-transparent 
