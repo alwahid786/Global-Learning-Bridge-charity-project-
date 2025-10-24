@@ -88,7 +88,7 @@ const Aside = () => {
     },
     // {
     //   id: 7,
-    //   title: "Clients",
+    //   title: "Client",
     //   link: ["/dashboard/clients"],
     //   icon: <UsersIcon />,
     // },
