@@ -47,7 +47,6 @@ const ArchievedInvoices = lazy(() =>
   import("./pages/admin/archieved/Invoices.Archieved")
 );
 const Settings = lazy(() => import("./pages/admin/settings/Settings"));
-const Clients = lazy(() => import("./pages/admin/clients/Clients"));
 const AdminLogin = lazy(() => import("./pages/admin/adminLogin/AdminLogin"));
 const AdminResetPassword = lazy(() =>
   import("./pages/admin/adminLogin/AdminResetPassword")
@@ -240,18 +239,6 @@ function App() {
                     allowedRoles={["admin"]}
                   >
                     <CompaniesResponseTime />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="clients"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <Clients />
                   </ProtectedRoute>
                 }
               />
