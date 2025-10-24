@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../../components/shared/small/landing-Button.jsx";
 import { Card, CardContent } from "../../../components/shared/small/card.jsx";
 import LandingHeader from "../../../components/public/landing-header/landing-header.jsx";
-import logo from "../../../assets/logo/logo.jpg";
+import logo from "../../../assets/logo/Logo.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGraduationCap,
