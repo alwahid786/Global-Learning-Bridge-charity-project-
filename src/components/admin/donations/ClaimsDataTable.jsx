@@ -19,6 +19,11 @@ import { useSelector } from "react-redux";
 import EditClaimsModal from "./EditClaimsModal";
 import ConfirmationModal from "../../../utils/ConfirmationModal";
 import { createPortal } from "react-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileInvoice } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+
+import ReceiptModal from "../../admin/donations/ReceiptModal";
 
 // Custom Status Dropdown styled as button=
 const StatusDropdown = ({ status, onChange }) => {
@@ -147,6 +152,7 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteClaimId, setDeleteClaimId] = useState(null);
   const [deleteClaim] = useDeleteClaimMutation();
+  const [showReceipt, setShowReceipt] = useState(null);
 
   const handleShowMore = (title, text) => {
     setInfoModal(text);
@@ -241,219 +247,182 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
   // Table columns--------
   const columns = [
     {
-      name: "RO Information",
+      name: "Name",
       selector: (row) => row,
       cell: (row) => (
         <div className="flex flex-col gap-1.5">
           <span className="text-dark font-normal text-xs ">
-            RO Number: {row.roNumber}
-          </span>
-          <span className="text-dark font-normal text-xs ">
-            RO Suffix: {row.roSuffix}
-          </span>
-          <span className="text-dark font-normal text-xs ">
-            RO Date: {row.roDate}
+            {row?.name || "John Doe"}
           </span>
         </div>
       ),
-      sortable: false,
+      sortable: true,
       grow: 2,
-      width: "210px",
-    },
-    {
-      name: "Job #",
-      selector: (row) => row.jobNumber,
-      cell: (row) => (
-        <span className="text-dark font-normal text-xs ">{row.jobNumber}</span>
-      ),
-      sortable: true,
-      width: "100px",
-    },
-    {
-      name: "Quoted",
-      selector: (row) => row.quoted,
-      cell: (row) => (
-        <span className="text-dark font-normal text-xs ">{row.quoted}</span>
-      ),
-      sortable: true,
-      width: "115px",
-    },
-    {
-      name: "Status",
-      cell: (row, idx) => (
-        <StatusDropdown
-          status={row.status}
-          onChange={(newStatus) => handleStatusChange(idx, newStatus, row)}
-        />
-      ),
-      sortable: false,
-      width: "110px",
-    },
-    {
-      name: "Entry Date",
-      selector: (row) => row.entryDate,
-      cell: (row) => (
-        <span className="text-dark font-normal text-xs ">{row.entryDate}</span>
-      ),
-      sortable: false,
-      width: "140px",
-    },
-    {
-      name: "Error Description",
-      selector: (row) => row?.errorDescription,
-      cell: (row) => (
-        <div
-          className="flex items-center text-dark font-normal text-xs max-w-[150px]"
-          title={row.errorDescription}
-        >
-          <span className="truncate">
-            {row.errorDescription.length > 30
-              ? row.errorDescription.slice(0, 30) + "..."
-              : row.errorDescription}
-          </span>
-          {row.errorDescription && (
-            <button
-              onClick={() =>
-                handleShowMore("Error Description", row.errorDescription)
-              }
-              className="ml-1 text-blue-500 hover:underline shrink-0"
-            >
-              View
-            </button>
-          )}
-        </div>
-      ),
-      grow: 3,
       width: "250px",
     },
     {
-      name: "Additional Information",
-      selector: (row) => row?.additionalInfo,
+      name: "Email",
+      selector: (row) => row.email,
       cell: (row) => (
-        <div
-          className="flex items-center text-dark font-normal text-xs max-w-[150px]"
-          title={row.additionalInfo}
-        >
-          <span className="truncate">
-            {row.additionalInfo.length > 30
-              ? row.additionalInfo.slice(0, 30) + "..."
-              : row.additionalInfo}
+        <span className="text-dark font-normal text-xs ">{row.email}</span>
+      ),
+      sortable: false,
+      width: "250px",
+    },
+    {
+      name: "Amount",
+      selector: (row) => row.amount,
+      cell: (row) => (
+        <span className="text-dark font-normal text-xs ">{row.amount}</span>
+      ),
+      sortable: true,
+      width: "170px",
+    },
+    {
+      name: "Currency",
+      selector: (row) => row.currency,
+      cell: (row) => (
+        <span className="text-dark font-normal text-xs ">{row.currency}</span>
+      ),
+      sortable: false,
+      width: "150px",
+    },
+    {
+      name: "Status",
+      cell: (row) => (
+        <div className="flex items-center gap-2">
+          <span
+            className={`font-normal text-xs ${
+              row.status === "pending"
+                ? "text-red-500"
+                : row.status === "succeeded"
+                ? "text-yellow-500"
+                : "text-dark"
+            }`}
+          >
+            {row.status}
           </span>
-          {row.additionalInfo && (
-            <button
-              onClick={() =>
-                handleShowMore("Additional Information", row.additionalInfo)
-              }
-              className="ml-1 text-blue-500 hover:underline shrink-0"
-            >
-              View
-            </button>
-          )}
         </div>
       ),
-      grow: 2,
-      width: "240px",
+      sortable: false,
+      width: "160px",
+    },
+    {
+      name: "Donation Date",
+      selector: (row) => row.createdAt,
+      cell: (row) => {
+        const date = new Date(row.createdAt);
+        const formattedDate = date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
+        return (
+          <span className="text-dark font-normal text-xs">
+            {formattedDate} at {formattedTime}
+          </span>
+        );
+      },
+      sortable: true,
+      width: "200px",
+    },
+    {
+      name: "View Receipt",
+      cell: (row) => (
+        <div className="flex justify-center items-center h-full w-full">
+          <button
+            className="p-2 rounded-full hover:bg-gray-100 flex items-center justify-center"
+            onClick={() => setShowReceipt(row)}
+          >
+            <FontAwesomeIcon
+              icon={faFileInvoice}
+              className="text-gray-600 text-2xl hover:text-blue-600 transition-all duration-200"
+            />
+          </button>
+        </div>
+      ),
+      sortable: false,
+      width: "130px",
+    },
+    {
+      name: "Send Receipt",
+      cell: (row) => (
+        <div className="flex justify-center items-center h-full w-full relative">
+          <button className="relative flex items-center justify-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-200 transition-all duration-200">
+            <FontAwesomeIcon
+              icon={faPaperPlane}
+              className="text-blue-700 text-lg"
+            />
+            <span className="font-medium text-sm">
+              {row?.sendCount > 0 ? "Resend" : "Send"}
+            </span>
+            {row?.sendCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
+                {row?.sendCount}
+              </span>
+            )}
+          </button>
+        </div>
+      ),
+      width: "180px",
     },
   ];
 
-  // to show internal notes to admin only
-  if (user?.role === "admin") {
-    columns.push({
-      name: "Internal Notes",
-      selector: (row) => row?.internalNotes,
-      cell: (row) => (
-        <div
-          className="flex items-center text-dark font-normal text-xs max-w-[150px]"
-          title={row.internalNotes}
-        >
-          <span className="truncate">
-            {row.internalNotes.length > 30
-              ? row.internalNotes.slice(0, 30) + "..."
-              : row.internalNotes}
-          </span>
-          {row.internalNotes && (
-            <button
-              onClick={() =>
-                handleShowMore("Internal Notes", row.internalNotes)
-              }
-              className="ml-1 text-blue-500 hover:underline shrink-0"
+  {
+    /* {toggleActionsMenu?._id === row._id && (
+            <div
+              ref={menuRef}
+              className="absolute bottom-0 right-7 mt-2 w-32 bg-white border rounded-lg shadow-lg z-20"
             >
-              View
-            </button>
-          )}
-        </div>
-      ),
-      grow: 2,
-      width: "240px",
-    });
+              <button
+                onClick={() => {
+                  handleEdit(row);
+                  setToggleActionsMenu(null);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100"
+              >
+                <HiOutlinePencil
+                  size={20}
+                  className="mr-2 inline-block text-yellow-600"
+                />
+                Edit
+              </button>
+              <button
+                onClick={() => {
+                  handleDelete(row);
+                  setToggleActionsMenu(null);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100 text-red-500"
+              >
+                <HiOutlineTrash
+                  size={20}
+                  className="mr-2 inline-block text-red-600"
+                />
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  setChatUser(row);
+                  setShowChat(true);
+                  setToggleActionsMenu(null);
+                }}
+                className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100"
+              >
+                <HiChatBubbleLeftRight
+                  size={20}
+                  className="mr-2 inline-block text-primary"
+                />
+                Send
+              </button>
+            </div>
+          )} */
   }
-
-  columns.push({
-    name: "Actions",
-    cell: (row) => (
-      <div className="relative flex justify-end w-full">
-        <button
-          className="p-2 rounded-full hover:bg-gray-100"
-          onClick={() =>
-            setToggleActionsMenu(
-              toggleActionsMenu?._id === row._id ? null : row
-            )
-          }
-        >
-          <HiOutlineDotsVertical className="text-gray-600" size={20} />
-        </button>
-
-        {toggleActionsMenu?._id === row._id && (
-          <div
-            ref={menuRef}
-            className="absolute bottom-0 right-7 mt-2 w-32 bg-white border rounded-lg shadow-lg z-20"
-          >
-            <button
-              onClick={() => {
-                handleEdit(row);
-                setToggleActionsMenu(null);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100"
-            >
-              <HiOutlinePencil
-                size={20}
-                className="mr-2 inline-block text-yellow-600"
-              />
-              Edit
-            </button>
-            <button
-              onClick={() => {
-                handleDelete(row);
-                setToggleActionsMenu(null);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100 text-red-500"
-            >
-              <HiOutlineTrash
-                size={20}
-                className="mr-2 inline-block text-red-600"
-              />
-              Delete
-            </button>
-            <button
-              onClick={() => {
-                setChatUser(row);
-                setShowChat(true);
-                setToggleActionsMenu(null);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-100"
-            >
-              <HiChatBubbleLeftRight
-                size={20}
-                className="mr-2 inline-block text-primary"
-              />
-              Chat
-            </button>
-          </div>
-        )}
-      </div>
-    ),
-    width: "100px",
-  });
 
   return (
     <div className="p-2 overflow-visible w-[97vw] md:w-[98vw] xl:w-[100%] rounded-lg bg-white shadow mt-5 mb-10">
@@ -474,37 +443,6 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
           }}
         />
       </div>
-      <div>
-        {showChat && (
-          <ChatModal
-            setAnimateIn={setAnimateIn}
-            animateIn={animateIn}
-            isOpen={!!showChat}
-            onClose={handleClose}
-            row={chatUser}
-            forInvoice={false}
-          />
-        )}
-      </div>
-      <div>
-        {infoModal && (
-          <div className="fixed inset-0 bg-gray-900/60 flex items-center justify-center z-50">
-            <div className="relative bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-              <button
-                onClick={() => setInfoModal(null)}
-                className="absolute top-3 right-3 text-gray-700 hover:text-gray-500"
-              >
-                <MdClose className="text-2xl" />
-              </button>
-
-              <div className="flex flex-col gap-2 text-center">
-                <h3 className="font-semibold mb-2">{infoModalTitle}</h3>
-                <p className="text-sm text-gray-700">{infoModal}</p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
       {isEditModalOpen && (
         <EditClaimsModal
           isOpen={isEditModalOpen}
@@ -521,6 +459,13 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
           onSave={handleDeleteClaim}
           data="Are you sure you want to delete this claim?"
           id={deleteClaimId}
+        />
+      )}
+      {showReceipt && (
+        <ReceiptModal
+          show={!!showReceipt}
+          onClose={() => setShowReceipt(null)}
+          data={showReceipt}
         />
       )}
     </div>

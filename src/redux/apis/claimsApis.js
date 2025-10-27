@@ -114,6 +114,25 @@ const claimsApis = createApi({
       }),
       providesTags: ["Claims"],
     }),
+
+    // Get All Donations
+    getAllDonations: builder.query({
+      query: () => ({
+        url: "/getAllDonations",
+        method: "GET",
+      }),
+      providesTags: ["Claims"],
+    }),
+
+    // Download Receipt
+    downloadReceipt: builder.mutation({
+      query: (id) => ({
+        url: `/downloadReceipt/${id}`,
+        method: "GET",
+        responseHandler: (res) => res.blob(),
+      }),
+      providesTags: ["Claims"],
+    }),
   }),
 });
 
@@ -130,6 +149,8 @@ export const {
   useGetClaimsStatQuery,
   useUpdateClaimsAdditionalDataMutation,
   useDeleteClaimMutation,
+  useGetAllDonationsQuery,
+  useDownloadReceiptMutation,
 } = claimsApis;
 
 export default claimsApis;

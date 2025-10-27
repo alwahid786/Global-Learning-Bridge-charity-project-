@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import ClaimsListHeader from "../../../components/admin/donations/ClaimsListHeader";
 import ClaimsDataTable from "../../../components/admin/donations/ClaimsDataTable";
 import ClaimsFilterBar from "../../../components/admin/donations/ClaimsFilterBar";
-import { useGetClaimsQuery } from "../../../redux/apis/claimsApis";
+import {
+  useGetClaimsQuery,
+  useGetAllDonationsQuery,
+} from "../../../redux/apis/claimsApis";
 
 const defaultFilters = {
   searchType: "roNumber",
@@ -17,9 +20,13 @@ const defaultFilters = {
 
 const Donations = () => {
   const [filters, setFilters] = useState(defaultFilters);
-  const { data } = useGetClaimsQuery(undefined, {
+  // const { data } = useGetClaimsQuery(undefined, {
+  //   refetchOnMountOrArgChange: true,
+  // });
+  const { data } = useGetAllDonationsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+
   const [selectedClaims, setSelectedClaims] = useState([]);
   const claims = Array.isArray(data) ? data : data?.data ?? [];
   const initialData = claims;
