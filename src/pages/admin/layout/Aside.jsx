@@ -46,7 +46,7 @@ const Aside = () => {
     {
       id: 1,
       title: "Dashboard",
-      link: ["/"],
+      link: ["/dashboard"],
       icon: <DashboardIcon />,
     },
     {

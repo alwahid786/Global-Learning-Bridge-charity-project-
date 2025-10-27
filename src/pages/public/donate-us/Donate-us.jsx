@@ -18,7 +18,7 @@ import { useCreatePaymentIntentMutation } from "../../../redux/apis/paymentApis"
 
 const stripePromise = loadStripe(getEnv("STRIPE_PUBLISH_KEY"));
 
-function CheckoutForm({ email, amount, onClose }) {
+function CheckoutForm({ name, email, amount, onClose }) {
   const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
@@ -32,6 +32,7 @@ function CheckoutForm({ email, amount, onClose }) {
     setPayProcessing(true);
     try {
       const res = await createPaymentIntent({
+        name,
         email,
         currency: "USD",
         amount,
@@ -47,15 +48,14 @@ function CheckoutForm({ email, amount, onClose }) {
 
       if (result.error) {
         toast.error(result.error.message);
-        setPayProcessing(false);
       } else if (result.paymentIntent.status === "succeeded") {
         toast.success("Thank you for your donation!");
-        setPayProcessing(false);
         onClose();
-        navigate("/thank-you");
+        navigate("/blog");
       }
     } catch (err) {
       toast.error(err?.data?.message || "Payment failed. Try again.");
+    } finally {
       setPayProcessing(false);
     }
   };
@@ -71,15 +71,9 @@ function CheckoutForm({ email, amount, onClose }) {
                 color: "#111827",
                 fontWeight: "500",
                 fontFamily: "Inter, system-ui, sans-serif",
-                "::placeholder": {
-                  color: "#6B7280",
-                  fontWeight: "400",
-                },
+                "::placeholder": { color: "#6B7280", fontWeight: "400" },
               },
-              invalid: {
-                color: "#EF4444",
-                iconColor: "#EF4444",
-              },
+              invalid: { color: "#EF4444", iconColor: "#EF4444" },
             },
             hidePostalCode: true,
           }}
@@ -116,18 +110,23 @@ function CheckoutForm({ email, amount, onClose }) {
 
 export default function DonateUs() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [terms, setTerms] = useState(false);
-  const [privacyPolicy, setPrivacyPolicy] = useState(false);
-  const [amount, setAmount] = useState(100);
+  const [amount, setAmount] = useState(1);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const emailRef = useRef(null);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    terms: false,
+    privacyPolicy: false,
+  });
+  const [errors, setErrors] = useState({});
 
   const donationInfo = {
     title: "Support Our Mission",
     description:
       "Your contribution helps us grow and make a bigger impact every day.",
-    minAmount: 100,
+    minAmount: 1,
     benefits: [
       "Keep the platform running",
       "Get exclusive updates",
@@ -137,24 +136,78 @@ export default function DonateUs() {
   };
 
   const handleCancel = () => {
-    setEmail("");
-    setPrivacyPolicy(false);
-    setTerms(false);
-    setAmount(donationInfo.minAmount);
+    setForm({
+      name: "",
+      phone: "",
+      email: "",
+      terms: false,
+      privacyPolicy: false,
+    });
+    setErrors({});
     toast.success("Form cleared");
   };
 
   const validateEmail = (v) => /\S+@\S+\.\S+/.test(v);
 
+  const validateField = (name, value) => {
+    switch (name) {
+      case "name":
+        return value.trim() ? "" : "Name is required";
+      case "email":
+        return !value
+          ? "Email is required"
+          : !validateEmail(value)
+          ? "Enter a valid email address"
+          : "";
+      default:
+        return "";
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   const handlePayClick = (e) => {
     e.preventDefault();
-    if (!email) return toast.error("Please enter your email");
-    if (!validateEmail(email)) return toast.error("Please enter a valid email");
-    if (!terms) return toast.error("Accept Terms & Conditions to continue");
-    if (!privacyPolicy) return toast.error("Accept Privacy Policy to continue");
+
+    const newErrors = {};
+    Object.keys(form).forEach((key) => {
+      if (key !== "terms" && key !== "privacyPolicy") {
+        const error = validateField(key, form[key]);
+        if (error) newErrors[key] = error;
+      }
+    });
+
+    if (!form.terms) newErrors.terms = "You must accept Terms & Conditions";
+    if (!form.privacyPolicy)
+      newErrors.privacyPolicy = "You must accept Privacy Policy";
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Please fix the errors before continuing");
+      return;
+    }
+
     if (!amount || amount < donationInfo.minAmount)
       return toast.error(`Minimum donation is $${donationInfo.minAmount}`);
+
     setShowPaymentModal(true);
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.6 } },
   };
 
   return (
@@ -165,118 +218,30 @@ export default function DonateUs() {
           className="w-full max-w-6xl flex flex-col lg:flex-row items-stretch gap-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ staggerChildren: 0.2 }}
         >
-          {/* LEFT */}
+          {/* LEFT SECTION */}
           <motion.div
-  className="lg:w-1/2 bg-white rounded-2xl shadow-xl border border-blue-100 p-8 flex flex-col justify-between relative overflow-hidden group"
-  whileHover={{ scale: 1.05 }}
-  transition={{ type: "spring", stiffness: 200, damping: 15 }}
->
-  <div className="absolute top-0 right-0 w-36 h-36 bg-[#0b5c83]/10 rounded-full -translate-y-16 translate-x-16 blur-2xl scale-125 group-hover:scale-150 transition-transform duration-500"></div>
-  <div className="absolute bottom-0 left-0 w-28 h-28 bg-indigo-500/10 rounded-full translate-y-12 -translate-x-12 blur-2xl group-hover:scale-125 transition-transform duration-500"></div>
-
-  <div className="relative z-10 flex flex-col items-center text-center">
-    <motion.div
-      initial={{ rotate: 0, scale: 1, y: 0 }}
-      whileHover={{ rotate: 10, scale: 1.25, y: -5 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      className="relative w-20 h-20 flex items-center justify-center mb-5"
-    >
-      <div className="absolute inset-0 bg-gradient-to-tr rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity"></div>
-      <div className="bg-[#0b5c83]/10 text-[#0b5c83] rounded-full p-5 shadow-lg relative z-10">
-        <FontAwesomeIcon icon={faHandHoldingDollar} className="text-3xl" />
-      </div>
-    </motion.div>
-
-    <div className="flex flex-col gap-4 justify-between items-center w-full mb-6">
-      <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
-        {donationInfo.title}
-      </h3>
-      <span className="bg-[#0b5c83]/10 text-[#0b5c83] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-        MIN ${donationInfo.minAmount}
-      </span>
-    </div>
-
-    <p className="text-gray-600 mb-8 leading-relaxed">
-      {donationInfo.description}
-    </p>
-
-    <div className="space-y-4 w-full text-left">
-      <h4 className="font-semibold text-gray-900 text-lg">
-        What your donation supports:
-      </h4>
-      <ul className="space-y-3">
-        {donationInfo.benefits.map((b, i) => (
-          <li key={i} className="flex items-center gap-3 text-gray-700 group/item">
-            <motion.div
-              whileHover={{ rotate: 360, scale: 1.2 }}
-              transition={{ duration: 0.6 }}
-              className="w-8 h-8 bg-[#0b5c83] rounded-full flex items-center justify-center flex-shrink-0 shadow-md"
-            >
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </motion.div>
-            <span className="group-hover/item:text-gray-900 transition-colors duration-300">
-              {b}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </div>
-</motion.div>
-
-
-
-          {/* RIGHT */}
-          <motion.div
-            className="lg:w-1/2 bg-white rounded-2xl shadow-xl border border-gray-100 p-8"
-            whileHover={{ scale: 1.01 }}
+            className="lg:w-1/2 bg-white rounded-2xl shadow-xl border border-blue-100 p-8 flex flex-col justify-between relative overflow-hidden group"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
           >
-            <div className="mb-8 text-center lg:text-left">
-              <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                Make a Donation
-              </h4>
-              <p className="text-gray-600">
-                Enter your details to support our mission
-              </p>
-            </div>
-
-            <form onSubmit={handlePayClick} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <input
-                    id="email"
-                    type="email"
-                    ref={emailRef}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="block w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    required
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    {email && validateEmail(email) && (
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="bg-[#0b5c83]/10 text-[#0b5c83] rounded-full p-5 shadow-lg mb-5">
+                <FontAwesomeIcon
+                  icon={faHandHoldingDollar}
+                  className="text-3xl"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">
+                {donationInfo.title}
+              </h3>
+              <p className="text-gray-600 mb-8">{donationInfo.description}</p>
+              <ul className="space-y-3 text-left">
+                {donationInfo.benefits.map((b, i) => (
+                  <li key={i} className="flex items-center gap-3 text-gray-700">
+                    <div className="w-6 h-6 bg-[#0b5c83] rounded-full flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-[#0b5c83]"
+                        className="w-4 h-4 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -284,106 +249,175 @@ export default function DonateUs() {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={2}
+                          strokeWidth={3}
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
+                    </div>
+                    {b}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+
+          {/* RIGHT FORM */}
+          <motion.div variants={itemVariants} className="lg:flex-1">
+            <div className="h-full bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+              <div className="mb-8 text-center lg:text-left">
+                <h4 className="text-3xl font-bold text-gray-900 mb-2">
+                  Make a Donation
+                </h4>
+                <p className="text-gray-600">
+                  Enter your details to support our mission
+                </p>
+              </div>
+
+              <form onSubmit={handlePayClick} className="space-y-6">
+                {/* Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Name
+                    </label>
+                    <input
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0b5c83] outline-none"
+                      placeholder="John Doe"
+                    />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Email
+                    </label>
+                    <input
+                      name="email"
+                      type="email"
+                      ref={emailRef}
+                      value={form.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0b5c83]"
+                      placeholder="you@example.com"
+                    />
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="amount"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Donation Amount ($)
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  min={donationInfo.minAmount}
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
-                  className="block w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3 p-4 bg-[#0b5c83]/5 rounded-xl border border-[#0b5c83]/20">
-                  <input
-                    id="terms"
-                    type="checkbox"
-                    checked={terms}
-                    onChange={(e) => setTerms(e.target.checked)}
-                    className="w-5 h-5 mt-1 accent-[#0b5c83] rounded focus:ring-[#0b5c83] flex-shrink-0"
-                  />
-                  <label htmlFor="terms" className="text-sm text-gray-700">
-                    I agree to the{" "}
-                    <a
-                      href="/terms-and-conditions"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#0b5c83] font-semibold hover:underline"
-                    >
-                      Terms & Conditions
-                    </a>
+                {/* Donation Amount */}
+                <div>
+                  <label className="block text-sm font-semibold mb-1">
+                    Donation Amount ($)
                   </label>
+                  <input
+                    type="number"
+                    min={donationInfo.minAmount}
+                    value={amount}
+                    onChange={(e) => setAmount(Number(e.target.value))}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0b5c83] outline-none"
+                  />
                 </div>
 
-                <div className="flex items-start space-x-3 p-4 bg-[#0b5c83]/5 rounded-xl border border-[#0b5c83]/20">
-                  <input
-                    id="privacyPolicy"
-                    type="checkbox"
-                    checked={privacyPolicy}
-                    onChange={(e) => setPrivacyPolicy(e.target.checked)}
-                    className="w-5 h-5 mt-1 accent-[#0b5c83] rounded focus:ring-[#0b5c83] flex-shrink-0"
-                  />
-                  <label
-                    htmlFor="privacyPolicy"
-                    className="text-sm text-gray-700"
+                {/* Terms */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      name="terms"
+                      type="checkbox"
+                      checked={form.terms}
+                      onChange={handleChange}
+                      className="accent-[#0b5c83]"
+                    />
+                    <span className="text-sm">
+                      I agree to the{" "}
+                      <a
+                        href="/terms-and-conditions"
+                        target="_blank"
+                        className="text-[#0b5c83] font-semibold hover:underline"
+                      >
+                        Terms & Conditions
+                      </a>
+                    </span>
+                  </label>
+                  {errors.terms && (
+                    <p className="text-red-500 text-sm">{errors.terms}</p>
+                  )}
+
+                  <label className="flex items-center gap-2">
+                    <input
+                      name="privacyPolicy"
+                      type="checkbox"
+                      checked={form.privacyPolicy}
+                      onChange={handleChange}
+                      className="accent-[#0b5c83]"
+                    />
+                    <span className="text-sm">
+                      I agree to the{" "}
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        className="text-[#0b5c83] font-semibold hover:underline"
+                      >
+                        Privacy Policy
+                      </a>
+                    </span>
+                  </label>
+                  {errors.privacyPolicy && (
+                    <p className="text-red-500 text-sm">
+                      {errors.privacyPolicy}
+                    </p>
+                  )}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+                  <Button
+                    type="button"
+                    onClick={handleCancel}
+                    className="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-xl transition-all duration-200"
                   >
-                    I agree to the{" "}
-                    <a
-                      href="/privacy-policy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#0b5c83] font-semibold hover:underline"
-                    >
-                      Privacy Policy
-                    </a>
-                  </label>
+                    Clear Form
+                  </Button>
+                  <Button
+                    type="submit"
+                    className={`w-full sm:w-auto px-8 py-4 font-bold rounded-xl transition-all duration-200 ${
+                      form.email &&
+                      validateEmail(form.email) &&
+                      form.terms &&
+                      form.privacyPolicy
+                        ? "bg-[#0b5c83] text-white hover:opacity-90"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
+                    disabled={
+                      !(
+                        form.email &&
+                        validateEmail(form.email) &&
+                        form.terms &&
+                        form.privacyPolicy
+                      )
+                    }
+                  >
+                    Donate ${amount}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-                <Button
-                  type="button"
-                  onClick={handleCancel}
-                  className="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:text-gray-900 font-semibold rounded-xl transition-all duration-200"
-                >
-                  Clear Form
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !(email && validateEmail(email) && terms && privacyPolicy)
-                  }
-                  className={`w-full sm:w-auto px-8 py-4 font-bold rounded-xl transition-all duration-200 ${
-                    email && validateEmail(email) && terms && privacyPolicy
-                      ? "bg-gradient-to-r from-[#0b5c83] to-[#0b5c83] hover:from-[#0b5c83] hover:to-[#0b5c83] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  }`}
-                >
-                  Donate ${amount}
-                </Button>
-              </div>
-            </form>
+              </form>
+            </div>
           </motion.div>
         </motion.div>
       </div>
 
+      {/* Payment Modal */}
       <AnimatePresence>
         {showPaymentModal && (
           <motion.div
@@ -399,35 +433,23 @@ export default function DonateUs() {
 
             <motion.div
               className="bg-white rounded-3xl w-full max-w-md mx-auto relative z-10 overflow-hidden shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", damping: 25 }}
             >
-              <div className="bg-gradient-to-r from-[#0b5c83] to-[#0b5c83] p-6 text-white">
+              <div className="bg-[#0b5c83] p-6 text-white">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-xl font-bold">Complete Your Donation</h4>
                   <button
                     onClick={() => setShowPaymentModal(false)}
-                    className="p-1 hover:bg-white/20 rounded-full transition-colors duration-200"
+                    className="p-1 hover:bg-white/20 rounded-full"
                   >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    ✕
                   </button>
                 </div>
-                <p className="text-[#0b5c83]">
-                  You're almost there! Just enter your card details
+                <p className="text-white/80 text-sm">
+                  You’re almost there! Enter your card details to finish.
                 </p>
               </div>
 
@@ -446,18 +468,17 @@ export default function DonateUs() {
 
                 <Elements stripe={stripePromise}>
                   <CheckoutForm
-                    email={email}
+                    name={form.name}
+                    email={form.email}
                     amount={amount}
                     onClose={() => setShowPaymentModal(false)}
                   />
                 </Elements>
 
-                <div className="mt-6 text-center">
-                  <p className="text-xs text-gray-500">
-                    Your payment is secure and encrypted. We never store your
-                    card details.
-                  </p>
-                </div>
+                <p className="mt-6 text-xs text-gray-500 text-center">
+                  Your payment is secure and encrypted. We never store your card
+                  details.
+                </p>
               </div>
             </motion.div>
           </motion.div>

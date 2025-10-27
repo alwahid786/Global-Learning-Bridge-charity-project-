@@ -11,13 +11,6 @@ import { useForgetPasswordMutation } from "../../../redux/apis/authApis";
 import { userExist, userNotExist } from "../../../redux/slices/authSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { useGetNotificationsQuery } from "../../../redux/apis/notificationsApis";
-import {
-  resetNotifications,
-  setNotifications,
-} from "../../../redux/slices/notificationsSlice";
-import notificationsApis from "../../../redux/apis/notificationsApis";
-import getEnv from "../../../configs/config";
 import logo from "../../../assets/logo/Logo.jpg";
 
 function AdminLogin() {
@@ -33,8 +26,6 @@ function AdminLogin() {
   const [login, { isLoading, error }] = useLoginMutation();
   const [forgetPassword, { isLoading: resetLoading, error: resetError }] =
     useForgetPasswordMutation();
-  const { refetch } = useGetMyProfileQuery();
-  const { refetch: notificationsRefetch } = useGetNotificationsQuery();
 
   const navigate = useNavigate();
 
@@ -44,27 +35,12 @@ function AdminLogin() {
       const res = await login(formData).unwrap();
 
       if (res?.success || res?.data) {
-        dispatch(notificationsApis.util.resetApiState());
-        dispatch(resetNotifications());
-
-        try {
-          await refetch();
-        } catch (e) {}
-        try {
-          await notificationsRefetch();
-        } catch (e) {}
-
-        toast.success(res?.message || "Login successful", { duration: 3000 });
+        toast.success(res?.message || "Login successful");
         dispatch(userExist(res?.data));
         navigate("/dashboard");
-      } else {
-        throw new Error("Unexpected response format");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      toast.error(err?.data?.message || err?.message || "Login failed", {
-        duration: 3000,
-      });
+      toast.error("Login failed");
     }
   };
 

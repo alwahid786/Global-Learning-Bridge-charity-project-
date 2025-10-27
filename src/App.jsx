@@ -58,26 +58,36 @@ const CompaniesResponseTime = lazy(() =>
 function App() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { data, isSuccess, isError, isLoading } = useGetMyProfileQuery();
+  const { data, isSuccess, isError, isLoading } = useGetMyProfileQuery(
+    undefined,
+    {
+      refetchOnMountOrArgChange: false,
+    }
+  );
+
   const { data: notifications } = useGetNotificationsQuery(undefined, {
     skip: !isSuccess,
+    refetchOnMountOrArgChange: false,
   });
 
   useEffect(() => {
-    if (isSuccess && data?.data) {
-      dispatch(userExist(data?.data));
+    if (!isSuccess || !data?.data) return;
+    dispatch(userExist(data.data));
 
-      if (notifications?.data?.length > 0) {
-        dispatch(unReadNotifications(notifications?.unReadCount));
-        dispatch(setNotifications(notifications?.data));
-      } else {
-        dispatch(noUnReadNotifications());
-      }
-    } else if (isError) {
+    if (notifications?.data?.length > 0) {
+      dispatch(unReadNotifications(notifications.unReadCount));
+      dispatch(setNotifications(notifications.data));
+    } else {
+      dispatch(noUnReadNotifications());
+    }
+  }, [isSuccess, data?.data, notifications?.data]);
+
+  useEffect(() => {
+    if (isError) {
       dispatch(userNotExist());
       dispatch(noUnReadNotifications());
     }
-  }, [data, isSuccess, isError, notifications, dispatch]);
+  }, [isError]);
 
   useEffect(() => {
     if (!user?._id) return;
@@ -101,15 +111,15 @@ function App() {
     };
   }, [user?._id, dispatch]);
 
-  console.log("user", user);
+  if (isLoading) return <Loader />;
 
-  if (!user && isLoading) return <Loader />;
   return (
-    <>
-      <BrowserRouter>
-        <Toaster position="top-right" reverseOrder={false} />
-        <Suspense fallback={<Loader />}>
+    <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Suspense fallback={<Loader />}>
+        {isSuccess || isError ? (
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/become-member" element={<BecomeMember />} />
             <Route path="/donate-us" element={<DonateUs />} />
@@ -121,21 +131,7 @@ function App() {
             <Route path="/thank-you" element={<ThankYouPage />} />
             <Route path="/blog" element={<Blog />} />
 
-            <Route
-              path="/"
-              element={
-                user ? (
-                  user.role === "admin" ? (
-                    <Navigate to="/dashboard" replace />
-                  ) : (
-                    <Navigate to="/blog" replace />
-                  )
-                ) : (
-                  <AdminLogin />
-                )
-              }
-            />
-
+            {/* Auth Routes */}
             <Route
               path="/login"
               element={
@@ -150,23 +146,12 @@ function App() {
                 )
               }
             />
-            <Route path="/login" element={<AdminLogin />} />
-
-            {/* <Route
-              path="/login"
-              element={
-                <ProtectedRoute user={!user} redirect="/dashboard">
-                  <AdminLogin />
-                </ProtectedRoute>
-              }
-            /> */}
-
             <Route
               path="/reset-password/:token"
               element={<AdminResetPassword />}
             />
 
-            {/* Protected Admin Layout */}
+            {/* Protected Routes */}
             <Route
               path="/dashboard"
               element={
@@ -175,80 +160,34 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              {/*  Nested Pages */}
               <Route index element={<Dashboard />} />
               <Route path="actions" element={<Actions />} />
-              <Route
-                path="invoices"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <Invoices />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="invoices" element={<Invoices />} />
               <Route path="notification" element={<Notification />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:pageId" element={<Users />} />
-              <Route
-                path="archieved"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <Archieved />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="archieved/actions"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <ArchievedActions />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="archieved" element={<Archieved />} />
+              <Route path="archieved/actions" element={<ArchievedActions />} />
               <Route
                 path="archieved/invoices"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <ArchievedInvoices />
-                  </ProtectedRoute>
-                }
+                element={<ArchievedInvoices />}
               />
               <Route path="settings" element={<Settings />} />
               <Route
                 path="companies-response-time"
-                element={
-                  <ProtectedRoute
-                    user={user}
-                    redirect="/"
-                    allowedRoles={["admin"]}
-                  >
-                    <CompaniesResponseTime />
-                  </ProtectedRoute>
-                }
+                element={<CompaniesResponseTime />}
               />
             </Route>
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </Suspense>
-      </BrowserRouter>
+        ) : (
+          <Loader />
+        )}
+      </Suspense>
       <GlobalAPILoader />
-    </>
+    </BrowserRouter>
   );
 }
-
 export default App;

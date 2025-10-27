@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 import { Navigate } from "react-router-dom";
+import Loader from "../components/shared/small/Loader";
 
 const ProtectedRoute = ({
   children,
@@ -7,9 +7,19 @@ const ProtectedRoute = ({
   allowedRoles,
   redirect = "/login",
 }) => {
-  if (!user) return <Navigate to={redirect} />;
-  if (allowedRoles && !allowedRoles?.includes(user.role))
-    return <Navigate to={redirect} />;
+  if (user === undefined) {
+    return <Loader />;
+  }
+
+  if (!user) {
+    return <Navigate to={redirect} replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={redirect} replace />;
+  }
+
+  // Step 4: Authorized access
   return children;
 };
 
