@@ -58,13 +58,13 @@ const Aside = () => {
     {
       id: 3,
       title: "Donations",
-      link: ["/dashboard/actions"],
+      link: ["/dashboard/donations"],
       icon: <ActionsIcon />,
     },
     {
       id: 3,
       title: "Blogs",
-      link: ["/dashboard/actions"],
+      link: ["/dashboard/blogs"],
       icon: <InvoicesIcon />,
     },
 

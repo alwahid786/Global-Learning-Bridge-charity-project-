@@ -56,17 +56,17 @@ const InvoicesListHeader = ({
         {/* Title & Description */}
         <div className="">
           <h2 className="text-2xl font-medium font-inter text-primary">
-            Invoices List
+            Blog Management
           </h2>
           <p className="text-sm font-inter font-medium text-secondary">
-            Review, update, and organize the invoices. Use filters to sort by
-            status, date, or brand.
+            Review, update, and organize the blogs. Use filters to sort by
+            status, date, or email.
           </p>
           {/* invoicessFilterBar below the title/description */}
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-wrap-reverse items-center gap-2 justify-end">
+        {/* <div className="flex flex-wrap-reverse items-center gap-2 justify-end">
           {showImportExport && (
             <Button
               icon={<LuPlus className="text-xs sm:text-sm" />}
@@ -90,7 +90,7 @@ const InvoicesListHeader = ({
             onClick={handleAddArchieveInvoices}
             cn="flex !py-2.5 text-xs sm:text-sm justify-center items-center truncate"
           />
-        </div>
+        </div> */}
         <InvoiceForm
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ClaimsListHeader from "../../../components/admin/actions/ClaimsListHeader";
-import ClaimsDataTable from "../../../components/admin/actions/ClaimsDataTable";
-import ClaimsFilterBar from "../../../components/admin/actions/ClaimsFilterBar";
+import ClaimsListHeader from "../../../components/admin/donations/ClaimsListHeader";
+import ClaimsDataTable from "../../../components/admin/donations/ClaimsDataTable";
+import ClaimsFilterBar from "../../../components/admin/donations/ClaimsFilterBar";
 import { useGetClaimsQuery } from "../../../redux/apis/claimsApis";
 
 const defaultFilters = {
@@ -15,7 +15,7 @@ const defaultFilters = {
   status: "",
 };
 
-const Actions = () => {
+const Donations = () => {
   const [filters, setFilters] = useState(defaultFilters);
   const { data } = useGetClaimsQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -107,4 +107,4 @@ const Actions = () => {
   );
 };
 
-export default Actions;
+export default Donations;

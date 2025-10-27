@@ -1,35 +1,55 @@
 // import { invoices as allInvoices } from '../../../data/data';
 // import InvoiceCard from "../../../components/admin/invoices/InvoicesCard";
-import InvoicesGrid from "../../../components/admin/members/InvoicesGrid";
-import Pagination from "../../../components/admin/members/InvoicesCardPagination";
+import InvoicesGrid from "../../../components/admin/blogs/InvoicesGrid";
+import Pagination from "../../../components/admin/blogs/InvoicesCardPagination";
 import { useState } from "react";
-import InvoicesListHeader from "../../../components/admin/members/InvoicesListHeader";
-import InvoicesFilterBar from "../../../components/admin/members/InvoicesFilterBar";
-import { useGetArchieveInvoicesQuery } from "../../../redux/apis/invoiceApis";
+import ChatModal from "../../../components/shared/small/ChatModal";
+import InvoicesListHeader from "../../../components/admin/blogs/InvoicesListHeader";
+import InvoicesFilterBar from "../../../components/admin/blogs/InvoicesFilterBar";
+import {
+  useGetClientsQuery,
+  useGetInvoicesQuery,
+  useGetMembersQuery,
+} from "../../../redux/apis/invoiceApis";
 
 const ITEMS_PER_PAGE = 6;
 
 const defaultFilters = {
-  searchType: "id",
+  searchType: "invoiceNumber",
   searchValue: "",
   fromDate: "",
   toDate: "",
   selectedBrand: null,
+  minFinalTotal: "",
+  maxFinalTotal: "",
   status: "",
 };
 
-const ArchievedInvoices = () => {
+const Members = () => {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState([]);
   const [chatUser, setChatUser] = useState(null);
   const [filters, setFilters] = useState(defaultFilters);
   const [animateIn, setAnimateIn] = useState(false);
   const handleChatOpen = (invoice) => setChatUser(invoice);
-  const { data } = useGetArchieveInvoicesQuery(undefined, {
+  // const { data } = useGetInvoicesQuery(undefined, {
+  //   refetchOnMountOrArgChange: true,
+  // });
+  const { data } = useGetMembersQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+  const { data: clientsData } = useGetClientsQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
 
   const allInvoices = Array.isArray(data) ? data : data?.data ?? [];
+
+  const handleClose = () => {
+    setAnimateIn(false);
+    setTimeout(() => {
+      handleChatClose();
+    }, 1000); // Match duration-500
+  };
 
   const handleChatClose = () => setChatUser(null);
   const handleSelect = (id) => {
@@ -112,9 +132,10 @@ const ArchievedInvoices = () => {
     <div className="w-full mx-auto ">
       <>
         <InvoicesListHeader
+          showImportExport={true}
+          clientsData={clientsData}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
-          showImportExport={false}
         />
       </>
       <div className="mb-4">
@@ -129,10 +150,11 @@ const ArchievedInvoices = () => {
         selectedIds={selectedIds}
         onSelect={handleSelect}
         onChatOpen={handleChatOpen}
+        clientsData={clientsData}
       />
       <Pagination current={page} total={totalPages} onPageChange={setPage} />
     </div>
   );
 };
 
-export default ArchievedInvoices;
+export default Members;

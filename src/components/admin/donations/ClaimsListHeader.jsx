@@ -76,7 +76,7 @@ const ClaimsListHeader = ({ selectedClaims, showImportExport = true }) => {
         {/* Title & Description */}
         <div className="">
           <h2 className="text-2xl font-medium font-inter text-primary">
-            Claims List
+            Donations Record
           </h2>
           <p className="text-sm font-inter font-medium text-secondary">
             Review, update, and organize user-submitted warranty claims. Use

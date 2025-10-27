@@ -129,6 +129,23 @@ const invoiceApis = createApi({
         method: "GET",
       }),
     }),
+
+    // Get All Members
+    getMembers: builder.query({
+      query: () => ({
+        url: "/getAllMembers",
+        method: "GET",
+      }),
+    }),
+
+    // Change Member Access Status
+    changeMemberAccess: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/changeMemberAccess/${id}?status=${data}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -146,6 +163,8 @@ export const {
   useGetArchieveInvoicesQuery,
   useRemoveArchieveInvoicesMutation,
   useAddArchieveInvoicesMutation,
+  useGetMembersQuery,
+  useChangeMemberAccessMutation,
 } = invoiceApis;
 
 export default invoiceApis;

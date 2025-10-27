@@ -1,14 +1,15 @@
 // import { invoices as allInvoices } from '../../../data/data';
 // import InvoiceCard from "../../../components/admin/invoices/InvoicesCard";
-import InvoicesGrid from "../../../components/admin/invoices/InvoicesGrid";
-import Pagination from "../../../components/admin/invoices/InvoicesCardPagination";
+import InvoicesGrid from "../../../components/admin/members/InvoicesGrid";
+import Pagination from "../../../components/admin/members/InvoicesCardPagination";
 import { useState } from "react";
 import ChatModal from "../../../components/shared/small/ChatModal";
-import InvoicesListHeader from "../../../components/admin/invoices/InvoicesListHeader";
-import InvoicesFilterBar from "../../../components/admin/invoices/InvoicesFilterBar";
+import InvoicesListHeader from "../../../components/admin/members/InvoicesListHeader";
+import InvoicesFilterBar from "../../../components/admin/members/InvoicesFilterBar";
 import {
   useGetClientsQuery,
   useGetInvoicesQuery,
+  useGetMembersQuery,
 } from "../../../redux/apis/invoiceApis";
 
 const ITEMS_PER_PAGE = 6;
@@ -31,7 +32,10 @@ const Members = () => {
   const [filters, setFilters] = useState(defaultFilters);
   const [animateIn, setAnimateIn] = useState(false);
   const handleChatOpen = (invoice) => setChatUser(invoice);
-  const { data } = useGetInvoicesQuery(undefined, {
+  // const { data } = useGetInvoicesQuery(undefined, {
+  //   refetchOnMountOrArgChange: true,
+  // });
+  const { data } = useGetMembersQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
   const { data: clientsData } = useGetClientsQuery(undefined, {
