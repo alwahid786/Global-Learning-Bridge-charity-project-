@@ -52,21 +52,22 @@ const Aside = () => {
     {
       id: 2,
       title: "Members",
+      link: ["/dashboard/members"],
+      icon: <InvoicesIcon />,
+    },
+    {
+      id: 3,
+      title: "Donations",
       link: ["/dashboard/actions"],
       icon: <ActionsIcon />,
     },
     {
       id: 3,
       title: "Blogs",
-      link: ["/dashboard/invoices"],
+      link: ["/dashboard/actions"],
       icon: <InvoicesIcon />,
     },
-    {
-      id: 3,
-      title: "Donations",
-      link: ["/dashboard/invoices"],
-      icon: <InvoicesIcon />,
-    },
+
     {
       id: 4,
       title: "Notifications",

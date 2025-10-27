@@ -34,7 +34,7 @@ const Blog = lazy(() => import("./pages/public/blog/Blog"));
 const AdminDashboard = lazy(() => import("./pages/admin/index"));
 const Dashboard = lazy(() => import("./pages/admin/dashboard/Dashboard"));
 const Actions = lazy(() => import("./pages/admin/actions/Actions"));
-const Invoices = lazy(() => import("./pages/admin/invoices/Invoices"));
+const Members = lazy(() => import("./pages/admin/members/members"));
 const Notification = lazy(() =>
   import("./pages/admin/notification/Notification")
 );
@@ -161,8 +161,8 @@ function App() {
               }
             >
               <Route index element={<Dashboard />} />
+              <Route path="members" element={<Members />} />
               <Route path="actions" element={<Actions />} />
-              <Route path="invoices" element={<Invoices />} />
               <Route path="notification" element={<Notification />} />
               <Route path="users" element={<Users />} />
               <Route path="users/:pageId" element={<Users />} />

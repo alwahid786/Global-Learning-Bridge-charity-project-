@@ -24,7 +24,7 @@ const defaultFilters = {
   status: "",
 };
 
-const Invoices = () => {
+const Members = () => {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState([]);
   const [chatUser, setChatUser] = useState(null);
@@ -153,4 +153,4 @@ const Invoices = () => {
   );
 };
 
-export default Invoices;
+export default Members;
