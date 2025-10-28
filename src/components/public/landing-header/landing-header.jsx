@@ -41,20 +41,30 @@ export default function LandingHeader() {
 
       {/* If user is logged in → Show Profile Info */}
       {user ? (
-        <div className="hidden md:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl border border-white/30 backdrop-blur-md">
-          <FontAwesomeIcon
-            icon={faUserCircle}
-            className="text-white text-2xl"
-          />
-          <div className="flex flex-col">
-            <span className="font-semibold text-white leading-tight">
-              {user.name || "User"}
-            </span>
-            <span className="text-sm text-white/80">
-              {user.email || "example@email.com"}
-            </span>
+        <>
+          <div className="hidden md:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl border border-white/30 backdrop-blur-md">
+            <FontAwesomeIcon
+              icon={faUserCircle}
+              className="text-white text-2xl"
+            />
+            <div className="flex flex-col">
+              <span className="font-semibold text-white leading-tight">
+                {user.name || "User"}
+              </span>
+              <span className="text-sm text-white/80">
+                {user.email || "example@email.com"}
+              </span>
+            </div>
           </div>
-        </div>
+          <div>
+            <Button
+              onClick={() => handleNavigate("/dashboard")}
+              className="bg-transparent border border-white text-white hover:bg-white hover:text-[rgb(11,92,131)] transition-colors duration-300 rounded-md px-5 py-2 font-semibold"
+            >
+              Dashboard
+            </Button>
+          </div>
+        </>
       ) : (
         /* Desktop Menu (Guest Buttons) */
         <div className="hidden md:flex items-center gap-3">
