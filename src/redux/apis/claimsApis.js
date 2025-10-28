@@ -133,6 +133,15 @@ const claimsApis = createApi({
       }),
       providesTags: ["Claims"],
     }),
+
+    // Send Email Receipt
+    sendReceipt: builder.mutation({
+      query: (id) => ({
+        url: `/sendEmailReceipt/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Claims"],
+    }),
   }),
 });
 
@@ -151,6 +160,7 @@ export const {
   useDeleteClaimMutation,
   useGetAllDonationsQuery,
   useDownloadReceiptMutation,
+  useSendReceiptMutation,
 } = claimsApis;
 
 export default claimsApis;

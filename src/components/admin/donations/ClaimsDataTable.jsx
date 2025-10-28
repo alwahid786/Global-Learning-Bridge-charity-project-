@@ -13,6 +13,8 @@ import {
   useUpdateClaimsMutation,
   useUpdateClaimsAdditionalDataMutation,
   useDeleteClaimMutation,
+  useSendReceiptMutation,
+  useGetAllDonationsQuery,
 } from "../../../redux/apis/claimsApis";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -154,6 +156,10 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
   const [deleteClaim] = useDeleteClaimMutation();
   const [showReceipt, setShowReceipt] = useState(null);
 
+  const [sendReceipt] = useSendReceiptMutation();
+
+  const { refetch: refetchDonations } = useGetAllDonationsQuery();
+
   const handleShowMore = (title, text) => {
     setInfoModal(text);
     setInfoModalTitle(title);
@@ -244,6 +250,16 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleSendReceipt = async (id) => {
+    try {
+      const res = await sendReceipt(id).unwrap();
+      await refetchDonations();
+      toast.success(res.message, { duration: 3000 });
+    } catch (error) {
+      toast.error(error.data.message, { duration: 3000 });
+    }
+  };
+
   // Table columns--------
   const columns = [
     {
@@ -294,9 +310,9 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
           <span
             className={`font-normal text-xs ${
               row.status === "pending"
-                ? "text-red-500"
+                ? "bg-red-500 text-white text-2xl px-3 py-1 rounded-md"
                 : row.status === "succeeded"
-                ? "text-yellow-500"
+                ? "bg-yellow-500 text-black text-2xl px-3 py-1 rounded-md"
                 : "text-dark"
             }`}
           >
@@ -354,7 +370,10 @@ const ClaimsDataTable = ({ data, onSelectionChange, archived = false }) => {
       name: "Send Receipt",
       cell: (row) => (
         <div className="flex justify-center items-center h-full w-full relative">
-          <button className="relative flex items-center justify-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-200 transition-all duration-200">
+          <button
+            onClick={() => handleSendReceipt(row._id)}
+            className="relative flex items-center justify-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-200 transition-all duration-200"
+          >
             <FontAwesomeIcon
               icon={faPaperPlane}
               className="text-blue-700 text-lg"

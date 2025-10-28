@@ -19,7 +19,6 @@ export default function ReceiptModal({ show, onClose, data }) {
         duration: 3000,
       });
     }
-    toast.success("Receipt Downloaded");
   };
   return (
     <AnimatePresence>
