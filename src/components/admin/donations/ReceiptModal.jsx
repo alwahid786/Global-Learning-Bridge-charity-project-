@@ -51,7 +51,7 @@ export default function ReceiptModal({ show, onClose, data }) {
               <img
                 src={logo}
                 alt="Company Logo"
-                className="w-30 h-30 object-contain mb-2"
+                className="w-60 h-60 object-contain mb-2"
               />
               <h2 className="text-lg font-bold text-gray-800">
                 Global Learning Bridge
