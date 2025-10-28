@@ -56,12 +56,18 @@ export default function LandingHeader() {
               </span>
             </div>
           </div>
-          <div>
+          <div className="flex gap-3">
             <Button
               onClick={() => handleNavigate("/dashboard")}
               className="bg-transparent border border-white text-white hover:bg-white hover:text-[rgb(11,92,131)] transition-colors duration-300 rounded-md px-5 py-2 font-semibold"
             >
               Dashboard
+            </Button>
+            <Button
+              onClick={() => handleNavigate("/blog")}
+              className="bg-transparent border border-white text-white hover:bg-white hover:text-[rgb(11,92,131)] transition-colors duration-300 rounded-md px-5 py-2 font-semibold"
+            >
+              Blogs
             </Button>
           </div>
         </>
